@@ -1,0 +1,452 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deepika R S - Neon Portfolio</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- GSAP CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #1a1a1a;
+            color: #e0e0e0;
+            overflow-x: hidden;
+        }
+        section {
+            scroll-margin-top: 120px;
+        }
+        .neon-glow {
+            box-shadow: 0 0 8px rgba(255, 102, 255, 0.6), 0 0 15px rgba(102, 204, 255, 0.5), 0 0 20px rgba(255, 102, 255, 0.4);
+        }
+        .neon-text {
+            text-shadow: 0 0 3px rgba(255, 102, 255, 0.6), 0 0 7px rgba(102, 204, 255, 0.5);
+        }
+        .nav-link:hover {
+            color: #ff66ff;
+            text-shadow: 0 0 7px rgba(255, 102, 255, 0.6);
+        }
+        .project-card {
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .project-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 0 10px rgba(102, 204, 255, 0.5), 0 0 15px rgba(255, 102, 255, 0.4);
+        }
+        .skill-badge {
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+        .skill-badge:hover {
+            background-color: #ff66ff;
+            box-shadow: 0 0 8px rgba(255, 102, 255, 0.6);
+        }
+        .logo-placeholder {
+            width: 200px;
+            height: 100px;
+            border: 2px dashed #66ccff;
+            background: #2d2d2d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #66ccff;
+            font-size: 1rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-purple-900 to-pink-600 py-6 sticky top-0 z-50 neon-glow">
+        <div class="container mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-bold text-white neon-text font-['Orbitron']">Deepika R S</h1>
+            <p class="text-lg md:text-xl text-cyan-200 mt-2">Information Science & Engineering Student | JAVA Developer | AI Enthusiast | Web Developer </p>
+            <nav class="mt-4">
+                <ul class="flex justify-center space-x-6">
+                    <li><a href="#about" class="nav-link text-white font-semibold hover:text-pink-500 transition">About</a></li>
+                    <li><a href="#education" class="nav-link text-white font-semibold hover:text-pink-500 transition">Education</a></li>
+                    <li><a href="#skills" class="nav-link text-white font-semibold hover:text-pink-500 transition">Skills</a></li>
+                    <li><a href="#projects" class="nav-link text-white font-semibold hover:text-pink-500 transition">Projects</a></li>
+                    <li><a href="#certifications" class="nav-link text-white font-semibold hover:text-pink-500 transition">Certifications</a></li>
+                    <li><a href="#internships" class="nav-link text-white font-semibold hover:text-pink-500 transition">Internships</a></li>
+                    <li><a href="#organizations" class="nav-link text-white font-semibold hover:text-pink-500 transition">Organizations</a></li>
+                    <li><a href="#hobbies" class="nav-link text-white font-semibold hover:text-pink-500 transition">Hobbies</a></li>
+                    <li><a href="#contact" class="nav-link text-white font-semibold hover:text-pink-500 transition">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- About Section -->
+    <section id="about" class="py-16 bg-gray-900">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl md:text-4xl font-bold text-cyan-300 neon-text text-center mb-8">About Me</h2>
+            <div class="flex flex-col md:flex-row items-center justify-center">
+                <img src="img src/me.jpg" alt="Deepika R S" class="w-48 h-48 rounded-full border-4 border-pink-500 neon-glow mb-6 md:mb-0 md:mr-8">
+                <p class="text-lg text-gray-300 max-w-2xl">
+                    Hi, I’m Deepika R S! A passionate Information Science & Engineering student with a knack for coding, problem-solving, and building impactful tech solutions. Skilled in Java, Python, web development, and machine learning, I love creating innovative projects. Currently, I’m exploring new technologies to refine my skills and make a difference in the tech world.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Education Section -->
+    <section id="education" class="py-16 bg-gray-800">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl md:text-4xl font-bold text-cyan-300 neon-text text-center mb-8">Education</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-gray-900 p-6 rounded-lg neon-glow">
+                    <h3 class="text-xl font-semibold text-pink-400">B.E. Information Science & Engineering</h3>
+                    <p class="text-gray-300">Malnad College of Engineering, Hassan (VTU)</p>
+                    <p class="text-gray-300">CGPA: 8.94 (Up to 6th Semester)</p>
+                    <p class="text-gray-300">Year: 2025</p>
+                </div>
+                <div class="bg-gray-900 p-6 rounded-lg neon-glow">
+                    <h3 class="text-xl font-semibold text-pink-400">12th Standard</h3>
+                    <p class="text-gray-300">Hoysaleshwara P U College, Arsikere</p>
+                    <p class="text-gray-300">Percentage: 97.16%</p>
+                    <p class="text-gray-300">Year: 2021</p>
+                </div>
+                <div class="bg-gray-900 p-6 rounded-lg neon-glow">
+                    <h3 class="text-xl font-semibold text-pink-400">10th Standard</h3>
+                    <p class="text-gray-300">S N S High School, Rampura, Arsikere</p>
+                    <p class="text-gray-300">Percentage: 96.96%</p>
+                    <p class="text-gray-300">Year: 2019</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section id="skills" class="py-16 bg-gray-900">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl md:text-4xl font-bold text-cyan-300 neon-text text-center mb-8">Technical Skills</h2>
+            <div class="flex flex-wrap justify-center gap-4">
+                <span class="skill-badge bg-gray-800 text-cyan-200 px-4 py-2 rounded-full neon-glow">C</span>
+                <span class="skill-badge bg-gray-800 text-cyan-200 px-4 py-2 rounded-full neon-glow">Java</span>
+                <span class="skill-badge bg-gray-800 text-cyan-200 px-4 py-2 rounded-full neon-glow">Python</span>
+                <span class="skill-badge bg-gray-800 text-cyan-200 px-4 py-2 rounded-full neon-glow">Web Technologies</span>
+                <span class="skill-badge bg-gray-800 text-cyan-200 px-4 py-2 rounded-full neon-glow">MySQL</span>
+                <span class="skill-badge bg-gray-800 text-cyan-200 px-4 py-2 rounded-full neon-glow">MongoDB</span>
+                <span class="skill-badge bg-gray-800 text-cyan-200 px-4 py-2 rounded-full neon-glow">Machine Learning</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="py-16 bg-gray-800">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl md:text-4xl font-bold text-cyan-300 neon-text text-center mb-8">Projects</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="project-card bg-gray-900 p-6 rounded-lg neon-glow">
+                    <h3 class="text-xl font-semibold text-pink-400">Automatic Question Paper Generating System</h3>
+                    <p class="text-gray-300">Developed using Apache NetBeans IDE, JDBC, MySQL.</p>
+                    <p class="text-gray-300">Year: 2024</p>
+                </div>
+                <div class="project-card bg-gray-900 p-6 rounded-lg neon-glow">
+                    <h3 class="text-xl font-semibold text-pink-400">Human Hand Sign Detection</h3>
+                    <p class="text-gray-300">An AI-driven system translating hand gestures into text using Python.</p>
+                    <p class="text-gray-300">Year: 2024</p>
+                </div>
+                <div class="project-card bg-gray-900 p-6 rounded-lg neon-glow">
+                    <h3 class="text-xl font-semibold text-pink-400">Student Project Management System</h3>
+                    <p class="text-gray-300">Developed using PHP, MySQL to track project details efficiently.</p>
+                    <p class="text-gray-300">Year: 2024</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Certifications Section -->
+    <section id="certifications" class="py-16 bg-gray-900">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl md:text-4xl font-bold text-cyan-300 neon-text text-center mb-8">Certifications</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-gray-900 p-6 rounded-lg neon-glow">
+                    <h3 class="text-xl font-semibold text-pink-400">FIGMA</h3>
+                    <p class="text-gray-300">Technical Career Education</p>
+                    <p class="text-gray-300">Year: 2022</p>
+                </div>
+                <div class="bg-gray-900 p-6 rounded-lg neon-glow">
+                    <h3 class="text-xl font-semibold text-pink-400">Soft Skills</h3>
+                    <p class="text-gray-300">NPTEL</p>
+                    <p class="text-gray-300">Year: 2023</p>
+                </div>
+                <div class="bg-gray-900 p-6 rounded-lg neon-glow">
+                    <h3 class="text-xl font-semibold text-pink-400">Full Stack Development</h3>
+                    <p class="text-gray-300">Seminar Room</p>
+                    <p class="text-gray-300">Year: 2024</p>
+                </div>
+                <div class="bg-gray-900 p-6 rounded-lg neon-glow">
+                    <h3 class="text-xl font-semibold text-pink-400">Machine Learning</h3>
+                    <p class="text-gray-300">Seminar Room</p>
+                    <p class="text-gray-300">Year: 2024</p>
+                </div>
+                <div class="bg-gray-900 p-6 rounded-lg neon-glow">
+                    <h3 class="text-xl font-semibold text-pink-400">Python</h3>
+                    <p class="text-gray-300">Great Learning</p>
+                    <p class="text-gray-300">Year: 2024</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Internships Section -->
+    <section id="internships" class="py-16 bg-gray-800">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl md:text-4xl font-bold text-cyan-300 neon-text text-center mb-8">Internships</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-gray-900 p-6 rounded-lg neon-glow">
+                    <h3 class="text-xl font-semibold text-pink-400">Web Development</h3>
+                    <p class="text-gray-300">JV Global Limited</p>
+                    <p class="text-gray-300">Duration: 3 weeks</p>
+                </div>
+                <div class="bg-gray-900 p-6 rounded-lg neon-glow">
+                    <h3 class="text-xl font-semibold text-pink-400">Advance JAVA</h3>
+                    <p class="text-gray-300">JV Global Limited</p>
+                    <p class="text-gray-300">Duration: 4 weeks</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Organizations Section -->
+    <section id="organizations" class="py-16 bg-gray-900">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl md:text-4xl font-bold text-cyan-300 neon-text text-center mb-8">Organizations</h2>
+            <div class="bg-gray-900 p-6 rounded-lg neon-glow max-w-2xl mx-auto">
+                <img src="img src/New Logo.png" alt="Rotaract club logo" class="w-20 h-15 mx-auto mb-4" >
+                <h3 class="text-xl font-semibold text-pink-400 text-center">Rotaract Club</h3>
+                <p class="text-gray-300 text-center">
+                    Active member of the Rotaract Club, contributing to community service initiatives, leadership development, and professional networking. Participated in charity drives, environmental campaigns, and youth empowerment programs, fostering teamwork and social impact.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Hobbies Section -->
+    <section id="hobbies" class="py-16 bg-gray-800">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl md:text-4xl font-bold text-cyan-300 neon-text text-center mb-8">Hobbies</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-gray-900 p-6 rounded-lg neon-glow">
+                    <img src="img src/BOOK.png" alt="Reading" class="w-25 h-24 mx-auto mb-4">
+                    <h3 class="text-xl font-semibold text-pink-400">Reading</h3>
+                    <p class="text-gray-300">Reading helps explore life from different perspectives, fostering creativity, analytical skills, and imagination.</p>
+                </div>
+                <div class="bg-gray-900 p-6 rounded-lg neon-glow">
+                    <img src="img src/art.png" alt="Painting" class="w-24 h-24 mx-auto mb-4">
+                    <h3 class="text-xl font-semibold text-pink-400">Painting</h3>
+                    <p class="text-gray-300">Applying paint to surfaces like canvas using brushes, sponges, or knives, expressing creativity and emotion.</p>
+                </div>
+                <div class="bg-gray-900 p-6 rounded-lg neon-glow">
+                    <img src="img src/code.png" alt="BackEnd Developer" class="w-24 h-24 mx-auto mb-4">
+                    <h3 class="text-xl font-semibold text-pink-400">BackEnd Developer</h3>
+                    <p class="text-gray-300">Creating code for relational mapping to retrieve data from databases like MySQL, PostgreSQL, and MongoDB.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-16 bg-gray-900">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl md:text-4xl font-bold text-cyan-300 neon-text text-center mb-8">Contact Me</h2>
+            <div class="text-center">
+                <p class="text-lg text-gray-300 mb-4">Email: <a href="mailto:deepikars168@gmail.com" class="text-cyan-200 hover:text-pink-500 transition">deepikars168@gmail.com</a></p>
+                <p class="text-lg text-gray-300 mb-4">LinkedIn: <a href="https://www.linkedin.com/in/deepika-r-s-378004316" target="_blank" class="text-cyan-200 hover:text-pink-500 transition">Deepika R S</a></p>
+                <p class="text-lg text-gray-300 mb-4">GitHub: <a href="https://github.com/deepikars-16" target="_blank" class="text-cyan-200 hover:text-pink-500 transition">Deepika R S</a></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gradient-to-r from-purple-900 to-pink-600 py-4 neon-glow">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-white">© 2025 Deepika R S | All Rights Reserved</p>
+        </div>
+    </footer>
+
+    <!-- GSAP Animations -->
+    <script>
+        // Register ScrollTrigger
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Header animation
+        gsap.from('header', {
+            opacity: 0,
+            y: -50,
+            duration: 1,
+            ease: 'power2.out'
+        });
+
+        // About section animation
+        gsap.from('#about img', {
+            scale: 0,
+            opacity: 0,
+            duration: 1,
+            ease: 'back.out(1.7)',
+            scrollTrigger: {
+                trigger: '#about',
+                start: 'top 80%'
+            }
+        });
+        gsap.from('#about p', {
+            x: 100,
+            opacity: 0,
+            duration: 1,
+            ease: 'power2.out',
+            scrollTrigger: {
+                trigger: '#about',
+                start: 'top 80%'
+            }
+        });
+
+        // Education cards animation
+        gsap.from('#education .bg-gray-900', {
+            y: 50,
+            opacity: 0,
+            duration: 0.8,
+            stagger: 0.2,
+            ease: 'power2.out',
+            scrollTrigger: {
+                trigger: '#education',
+                start: 'top 80%'
+            }
+        });
+
+        // Skills badges animation
+        gsap.from('.skill-badge', {
+            scale: 0,
+            opacity: 0,
+            duration: 0.5,
+            stagger: 0.1,
+            ease: 'back.out(1.7)',
+            scrollTrigger: {
+                trigger: '#skills',
+                start: 'top 80%'
+            }
+        });
+
+        // Project cards animation
+        gsap.from('.project-card', {
+            y: 50,
+            opacity: 0,
+            duration: 0.8,
+            stagger: 0.2,
+            ease: 'power2.out',
+            scrollTrigger: {
+                trigger: '#projects',
+                start: 'top 80%'
+            }
+        });
+
+        // Certifications animation
+        gsap.from('#certifications .bg-gray-900', {
+            y: 50,
+            opacity: 0,
+            duration: 0.8,
+            stagger: 0.2,
+            ease: 'power2.out',
+            scrollTrigger: {
+                trigger: '#certifications',
+                start: 'top 80%'
+            }
+        });
+
+        // Internships animation
+        gsap.from('#internships .bg-gray-900', {
+            y: 50,
+            opacity: 0,
+            duration: 0.8,
+            stagger: 0.2,
+            ease: 'power2.out',
+            scrollTrigger: {
+                trigger: '#internships',
+                start: 'top 80%'
+            }
+        });
+
+        // Organizations animation
+        gsap.from('#organizations .bg-gray-900', {
+            y: 50,
+            opacity: 0,
+            duration: 0.8,
+            ease: 'power2.out',
+            scrollTrigger: {
+                trigger: '#organizations',
+                start: 'top 80%'
+            }
+        });
+
+        // Hobbies section animation
+        gsap.from('#hobbies .bg-gray-900', {
+            y: 50,
+            opacity: 0,
+            duration: 0.8,
+            stagger: 0.2,
+            ease: 'power2.out',
+            scrollTrigger: {
+                trigger: '#hobbies',
+                start: 'top 80%'
+            }
+        });
+
+        // Contact section animation
+        gsap.from('#contact p', {
+            x: -100,
+            opacity: 0,
+            duration: 1,
+            stagger: 0.2,
+            ease: 'power2.out',
+            scrollTrigger: {
+                trigger: '#contact',
+                start: 'top 80%'
+            }
+        });
+    </script>
+</body>
+</html>
